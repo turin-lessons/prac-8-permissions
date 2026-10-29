@@ -3,45 +3,58 @@ package com.example.permissions
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import com.example.permissions.ui.screens.*
 import com.example.permissions.ui.theme.PermissionsTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         setContent {
             PermissionsTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+                ) {
+                    var selectedTask by remember { mutableIntStateOf(2) }
+
+                    // statusBarsPadding() qo'shildi 👇
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .statusBarsPadding()
+                    ) {
+                        ScrollableTabRow(selectedTabIndex = selectedTask - 2) {
+                            for (task in 2..6) {
+                                Tab(
+                                    selected = selectedTask == task,
+                                    onClick = { selectedTask = task },
+                                    text = { Text("Task $task") }
+                                )
+                            }
+                        }
+
+                        // Display the active task screen
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(16.dp)
+                        ) {
+                            when (selectedTask) {
+                                2 -> NetworkStatusScreen()
+                                3 -> CameraPermissionsScreen()
+                                4 -> OverlayPermissionScreen()
+                                5 -> LocationPermissionScreen()
+                                6 -> NotificationScreen()
+                            }
+                        }
+                    }
                 }
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    PermissionsTheme {
-        Greeting("Android")
     }
 }
